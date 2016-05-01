@@ -1,4 +1,4 @@
-var NEXTFRAME = undefined
+var NEXTFRAME = undefined;
 var disableCookies = false;
 var cookieSet = "";
 var cookie = {
