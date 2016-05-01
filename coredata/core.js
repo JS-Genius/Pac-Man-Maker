@@ -28,7 +28,7 @@ var screen = {
       height: document.getElementById("game").height,
       draw: document.getElementById("game").getContext("2d"),
       keys: [],
-      mouse: {
+      mouse: {z
             x: 0,
             y: 0,
             click: function() {},
