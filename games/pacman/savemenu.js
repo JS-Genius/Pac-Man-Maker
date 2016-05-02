@@ -1,19 +1,20 @@
 var NEXTFRAME = undefined;
-var disableCookies = false;
+var disableCookies = (typeof(Storage) == undefined);
 var cookieSet = "";
 var cookie = {
             set: function(name,value) {
                   if(disableCookies) {
                         cookieSet[name] = value;
                   } else {
-                        document.cookie = name+"="+value;
+                        //document.cookie = name+"="+value;
+                        localStorage.setItem(name, value);
                   };
             },
             get: function(name) {
                   if(disableCookies) {
                         return cookieSet[name];
                   } else {
-                        name += "=";
+                        /*name += "=";
                         var ca = document.cookie.split(';');
                         for(var i = 0;i<ca.length;i++) {
                               var c = ca[i];
@@ -23,16 +24,10 @@ var cookie = {
                               if(c.indexOf(name) == 0) {
                                     return c.substring(name.length,c.length);
                               };
-                        };
-                        return "";
+                        };*/
+                        return localStorage.getItem(name);
                   };
             },
-};
-cookie.set('cookies','true');
-if(cookie.get('cookies') == 'true') {
-      disableCookies = false;
-} else {
-      disableCookies = true;
 };
 if(disableCookies) {
       cookieSet = prompt('Input a JSON Cookie String');
