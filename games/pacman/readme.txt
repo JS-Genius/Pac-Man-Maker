@@ -1,0 +1,38 @@
+Building Mode
+- press '=' to go to Testing mode
+- The textbox closest to the left is where you input what you want to place
+- That textbox will look like 'wall{}' by default
+- You can change the type of entity by changing the text before the '{}'
+- Some entities include
+  - Walls written as wall
+  - Ghosts written as ghost
+  - Ghost Spawners written as ghostSpawn
+  - Power Ups written as pUp
+  - Coins written as coin
+- You can add/change attributes of an entity by writing "attribute":"value" inside the '{}' for example with color = #FF0000 you would write {"color":"#FF0000"}
+- Some attributes include
+  - color
+  - width
+  - height
+  - pUp
+    - used as pUp{"pUp":{"type":type,"time":time}}
+- There are multiple types of power ups including
+  - lime
+    - effect is ghosts are edible and 2x boost in speed
+  - cyan
+    - effect is 3x boost in speed
+  - purple
+    - effect is 2x boost in speed
+  - mini
+    - effect is you grow smaller to go through small paths+
+- When you are adding Walls click to begin adding a wall and release to finish the wall
+- When you are adding other Entities click to add the entity
+- press Ctrl+S to save your level in a file
+- press Ctrl+E to erase a segment of a wall or an entire entity
+
+Testing Mode
+- press '=' to go to Building mode
+- use the Arrow keys to move
+- if you touch a ghost you are dead unless you have a lime power up
+- if you touch a power up you get its power
+- if you collect all the coins you win

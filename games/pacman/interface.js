@@ -48,6 +48,12 @@ screen.enableDefaultCtrl('X');
 screen.enableDefaultCtrl('V');
 //creates a function that runs when the player is in building mode
 var BUILDER = function() {
+      //runs NEXTFRAME function
+      if(NEXTFRAME !== undefined) {
+            var f = NEXTFRAME;
+            NEXTFRAME = undefined;
+            f();
+      };
       //sets addObject to the object input
       addObject = codeAdd.value
       codeInput.style.width = screen.width/5-2 + "px";

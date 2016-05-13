@@ -7,7 +7,7 @@ var cookie = {
                         cookieSet[name] = value;
                   } else {
                         //document.cookie = name+"="+value;
-                        localStorage.setItem(name, value);
+                        localStorage.setItem(name,value);
                   };
             },
             get: function(name) {
@@ -24,10 +24,18 @@ var cookie = {
                               if(c.indexOf(name) == 0) {
                                     return c.substring(name.length,c.length);
                               };
-                        };*/
+                        };
+                        return "";*/
                         return localStorage.getItem(name);
                   };
             },
+};
+if(!disableCookies) {
+      cookie.set('test','true');
+      if(cookie.get('test') !== 'true') {
+            disableCookies = true;
+            console.error('Cannot access local storage');
+      };
 };
 if(disableCookies) {
       cookieSet = prompt('Input a JSON Cookie String');
@@ -48,6 +56,12 @@ if(rlBeat == "" || rlBeat == undefined) {
       rlBeat = cookie.get('rlbeat');
 };
 rlBeat = Number(rlBeat);
+var unlocked = cookie.get('use');
+if(unlocked == "" || unlocked == undefined) {
+      cookie.set('use','{}');
+      unlocked = cookie.get('use');
+};
+unlocked = JSON.parse(unlocked);
 var gameSquareButtons = {};
 var menu = "main";
 var OPENRLMENU = function() {
@@ -102,48 +116,276 @@ n.addEventListener('change', function(event) {
             document.body.removeChild(s);
       };
 });
-var popUpCreatedMenu = function(l,txt) {
-      var cmd = prompt(txt);
+var selectedL = {
+      levelNo: null,
+      menu: false,
+      created: null,
+};
+var SIDEMENU = function() {
+      gameSquareButtons = {};
+      screen.draw.fillStyle = "#F0D000";
+      screen.draw.fillRect(screen.width*3/4,0,screen.width/4,screen.height);
+      if(selectedL.created) {
+            screen.draw.fillStyle = "#D0F000";
+            screen.draw.fillRect(screen.width*13/16,screen.height*8/20,screen.width/8,screen.height/20);
+            screen.draw.fillStyle = "#2F0FFF";
+            screen.draw.font = screen.width*1/16+"px Impact, Charcoal, sans-serif";
+            screen.draw.fillText('EDIT',screen.width*13/16,screen.height*9/20);
+            gameSquareButtons.ed = {
+                 left: 13/16,
+                 top: 8/20,
+                 width: 1/8,
+                 height: 1/20,
+                 click: function() {
+                       runCreatedCMD('edit');
+                 },
+            };
+            screen.draw.fillStyle = "#D0F000";
+            screen.draw.fillRect(screen.width*13/16,screen.height*11/20,screen.width/8,screen.height/20);
+            screen.draw.fillStyle = "#2F0FFF";
+            screen.draw.font = screen.width*1/16+"px Impact, Charcoal, sans-serif";
+            screen.draw.fillText('PLAY',screen.width*13/16,screen.height*12/20);
+            gameSquareButtons.pl = {
+                 left: 13/16,
+                 top: 11/20,
+                 width: 1/8,
+                 height: 1/20,
+                 click: function() {
+                       runCreatedCMD('play');
+                 },
+            };
+            screen.draw.fillStyle = "#FF0000";
+            screen.draw.fillRect(screen.width*13/16,screen.height*14/20,screen.width/8,screen.height/20);
+            screen.draw.fillStyle = "#00FFFF";
+            screen.draw.font = screen.width*1/22+"px Impact, Charcoal, sans-serif";
+            screen.draw.fillText('DELETE',screen.width*13/16,screen.height*15/20);
+            gameSquareButtons.del = {
+                 left: 13/16,
+                 top: 14/20,
+                 width: 1/8,
+                 height: 1/20,
+                 click: function() {
+                       runCreatedCMD('delete');
+                 },
+            };
+            gameSquareButtons.back = {
+                 left: 13/16,
+                 top: 18/20,
+                 width: 1/8,
+                 height: 1/20,
+                 click: function() {
+                       runCreatedCMD('exit');
+                 },
+            };
+      } else {
+            screen.draw.fillStyle = "#D0F000";
+            screen.draw.fillRect(screen.width*13/16,screen.height*10/20,screen.width/8,screen.height/20);
+            screen.draw.fillStyle = "#2F0FFF";
+            screen.draw.font = screen.width*1/24+"px Impact, Charcoal, sans-serif";
+            screen.draw.fillText('CREATE',screen.width*13/16,screen.height*11/20);
+            gameSquareButtons.c = {
+                 left: 13/16,
+                 top: 10/20,
+                 width: 1/8,
+                 height: 1/20,
+                 click: function() {
+                       runUnCMD('create');
+                 },
+            };
+            gameSquareButtons.back = {
+                 left: 13/16,
+                 top: 18/20,
+                 width: 1/8,
+                 height: 1/20,
+                 click: function() {
+                       runUnCMD('exit');
+                 },
+            };
+      };
+      screen.draw.fillStyle = "#00D0F0";
+      screen.draw.fillRect(screen.width*13/16,screen.height*18/20,screen.width/8,screen.height/20);
+      screen.draw.fillStyle = "#FF2F0F";
+      screen.draw.font = screen.width*1/16+"px Impact, Charcoal, sans-serif";
+      screen.draw.fillText('BACK',screen.width*13/16,screen.height*19/20);
+};
+var runCreatedCMD = function(cmd) {
       if(cmd == 'delete') {
-            levels[l].name = '';
-            levels[l].level = {};
-            levels[l].used = false;
+            levels[selectedL.levelNo].name = '';
+            levels[selectedL.levelNo].level = {};
+            levels[selectedL.levelNo].used = false;
             cookie.set('levels',JSON.stringify(levels));
       } else if(cmd == 'edit') {
-            build=levels[l].level;
-            creatingStage = l;
+            build=levels[selectedL.levelNo].level;
+            creatingStage = selectedL.levelNo;
             style='buildtest';
+            NEXTFRAME = function() {
+                  points = [];
+                  NEXTFRAME = function() {
+                        points = [];
+                        NEXTFRAME = function() {
+                              points = [];
+                              NEXTFRAME = function() {
+                                          points = [];
+                                    NEXTFRAME = function() {
+                                                points = [];
+                                          NEXTFRAME = function() {
+                                                      points = [];
+                                          };
+                                    };
+                              };
+                        };
+                  };
+            };
       } else if(cmd == 'play') {
-            game.player = levels[l].level.player;
-            game.entities = levels[l].level.entities;
-            game.wall = levels[l].level.wall;
-            game.settings = levels[l].level.settings;
+            game.player = levels[selectedL.levelNo].level.player;
+            game.entities = levels[selectedL.levelNo].level.entities;
+            game.wall = levels[selectedL.levelNo].level.wall;
+            game.settings = levels[selectedL.levelNo].level.settings;
             style='game';
       } else if(cmd == 'exit') {
-      } else {
-            popUpCreatedMenu(l,'This is not a valid command. Input command');
+      };
+      selectedL = {
+            levelNo: null,
+            menu: false,
+            created: null,
       };
 };
-var popUpNotCreatedMenu = function(l,txt) {
-      var cmd = prompt(txt);
+var popUpCreatedMenu = function(l) {
+      selectedL = {
+            levelNo: l,
+            menu: true,
+            created: true,
+      };
+};
+var runUnCMD = function(cmd) {
       if(cmd == 'create') {
-            levels[l].name = '';
-            levels[l].level = {"entities":{},"wall":{},"player":{"x":0.5,"y":0.5,"coins":0,"direction":0,"spX":0.002,"spY":0.002,"pUp":{"type":"none","time":0}},"settings":{"background":"#000000","coins":0,"pUp":{}}};
+            levels[selectedL.levelNo].name = '';
+            levels[selectedL.levelNo].level = {"entities":{},"wall":{},"player":{"x":0.5,"y":0.5,"coins":0,"direction":0,"spX":0.002,"spY":0.002,"pUp":{"type":"none","time":0}},"settings":{"background":"#000000","coins":0,"pUp":{}}};
             style = 'buildtest';
-            creatingStage = l;
-            build=JSON.parse(JSON.stringify(levels[l].level));
+            creatingStage = selectedL.levelNo;
+            build=JSON.parse(JSON.stringify(levels[selectedL.levelNo].level));
             cookie.set('levels',JSON.stringify(levels));
+            NEXTFRAME = function() {
+                  points = [];
+                  NEXTFRAME = function() {
+                        points = [];
+                        NEXTFRAME = function() {
+                              points = [];
+                              NEXTFRAME = function() {
+                                          points = [];
+                                    NEXTFRAME = function() {
+                                                points = [];
+                                          NEXTFRAME = function() {
+                                                      points = [];
+                                          };
+                                    };
+                              };
+                        };
+                  };
+            };
       } else if(cmd == 'exit') {
-      } else {
-            popUpNotCreatedMenu(l,'This is not a valid command. Input command');
+      };
+      selectedL = {
+            levelNo: null,
+            menu: false,
+            created: null,
+      };
+};
+var popUpNotCreatedMenu = function(l) {
+      selectedL = {
+            levelNo: l,
+            menu: true,
+            created: false,
       };
 };
 var stagePressed = function(l) {
       if(levels[l].used) {
-            popUpCreatedMenu(l,'Input command');
+            popUpCreatedMenu(l);
       } else {
-            popUpNotCreatedMenu(l,'Input command');
+            popUpNotCreatedMenu(l);
       };
+};
+var drawLevels = function(i) {
+            if(levels[i*4] == undefined) {
+                  levels[i*4] = {used: false, level: {}, name: "",};
+                  cookie.set('levels',JSON.stringify(levels));
+            };
+            gameSquareButtons['l'+(i*4+0)] = {
+                  left: 3/20,
+                  top: 40/screen.height+((7/40+(i*4/20))),
+                  width: 1/10,
+                  height: 1/10,
+                  click: function() {
+                        stagePressed(i*4+0);
+                  },
+            };
+            if(levels[i*4].used) {
+                  screen.draw.fillStyle = "#FF0000";
+            } else {
+                  screen.draw.fillStyle = "#808080";
+            };
+            screen.draw.fillEllipse(4/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/20*screen.width,1/20*screen.height,0,Math.PI*2);
+            screen.draw.fillRect(3/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/10*screen.width,1/20*screen.height);
+            if(levels[i*4+1] == undefined) {
+                  levels[i*4+1] = {used: false, level: {}, name: "",};
+                  cookie.set('levels',JSON.stringify(levels));
+            };
+            gameSquareButtons['l'+(i*4+1)] = {
+                  left: 7/20,
+                  top: 40/screen.height+((7/40+(i*4/20))),
+                  width: 1/10,
+                  height: 1/10,
+                  click: function() {
+                        stagePressed(i*4+1);
+                  },
+            };
+            if(levels[i*4+1].used) {
+                  screen.draw.fillStyle = "#FF00FF";
+            } else {
+                  screen.draw.fillStyle = "#808080";
+            };
+            screen.draw.fillEllipse(8/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/20*screen.width,1/20*screen.height,0,Math.PI*2);
+            screen.draw.fillRect(7/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/10*screen.width,1/20*screen.height);
+            if(levels[i*4+2] == undefined) {
+                  levels[i*4+2] = {used: false, level: {}, name: "",};
+                  cookie.set('levels',JSON.stringify(levels));
+            };
+            gameSquareButtons['l'+(i*4+2)] = {
+                  left: 11/20,
+                  top: 40/screen.height+((7/40+(i*4/20))),
+                  width: 1/10,
+                  height: 1/10,
+                  click: function() {
+                        stagePressed(i*4+2);
+                  },
+            };
+            if(levels[i*4+2].used) {
+                  screen.draw.fillStyle = "#00FFFF";
+            } else {
+                  screen.draw.fillStyle = "#808080";
+            };
+            screen.draw.fillEllipse(12/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/20*screen.width,1/20*screen.height,0,Math.PI*2);
+            screen.draw.fillRect(11/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/10*screen.width,1/20*screen.height);
+            if(levels[i*4+3] == undefined) {
+                  levels[i*4+3] = {used: false, level: {}, name: "",};
+                  cookie.set('levels',JSON.stringify(levels));
+            };
+            gameSquareButtons['l'+(i*4+3)] = {
+                  left: 15/20,
+                  top: 40/screen.height+((7/40+(i*4/20))),
+                  width: 1/10,
+                  height: 1/10,
+                  click: function() {
+                        stagePressed(i*4+3);
+                  },
+            };
+            if(levels[i*4+3].used) {
+                  screen.draw.fillStyle = "#FF8000";
+            } else {
+                  screen.draw.fillStyle = "#808080";
+            };
+            screen.draw.fillEllipse(16/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/20*screen.width,1/20*screen.height,0,Math.PI*2);
+            screen.draw.fillRect(15/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/10*screen.width,1/20*screen.height);
 };
 gameSquareButtons.rl = {
      left: 13/40,
@@ -240,7 +482,7 @@ var SAVEMENU = function() {
                   OPENPWMENU();
             },
       };
-      screen.draw.fillRect(0,0,screen.width,screen.height);
+      screen.draw.fillRect(0,0,document.getElementById("game").width,document.getElementById("game").height);
       screen.draw.font = "36px Impact, Charcoal, sans-serif";
       screen.draw.fillStyle = "#0000FF";
       screen.draw.fillText("PACMAN LEVEL MENU", screen.width/2-(18*17/2),36);
@@ -269,86 +511,14 @@ var SAVEMENU = function() {
       screen.draw.font = (1/10)/9*screen.width+"px Impact, Charcoal, sans-serif";
       screen.draw.fillText("PASSWORD",25/40*screen.width,40+(3/40*screen.height));
       for(var i = 0;i<=Math.floor(rlBeat/4);i++) {
-            if(levels[i*4] == undefined) {
-                  levels[i*4] = {used: false, level: {}, name: "",};
-                  cookie.set('levels',JSON.stringify(levels));
+            if(1<(40/screen.height+(9/40+(i*4/20)))) {
+                  document.getElementById("game").height = 40+((9/40+(i*4/20))*screen.height);
+                  document.getElementById("game").width = window.innerWidth;
             };
-            gameSquareButtons['l'+((i-1)*4+0)] = {
-                  left: 3/20,
-                  top: 40/screen.height+((7/40+(i*4/20))),
-                  width: 1/10,
-                  height: 1/10,
-                  click: function() {
-                        stagePressed((i-1)*4+0);
-                  },
-            };
-            if(levels[i*4].used) {
-                  screen.draw.fillStyle = "#FF0000";
-            } else {
-                  screen.draw.fillStyle = "#808080";
-            };
-            screen.draw.fillEllipse(4/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/20*screen.width,1/20*screen.height,0,Math.PI*2);
-            screen.draw.fillRect(3/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/10*screen.width,1/20*screen.height);
-            if(levels[i*4+1] == undefined) {
-                  levels[i*4+1] = {used: false, level: {}, name: "",};
-                  cookie.set('levels',JSON.stringify(levels));
-            };
-            gameSquareButtons['l'+((i-1)*4+1)] = {
-                  left: 7/20,
-                  top: 40/screen.height+((7/40+(i*4/20))),
-                  width: 1/10,
-                  height: 1/10,
-                  click: function() {
-                        stagePressed((i-1)*4+1);
-                  },
-            };
-            if(levels[i*4+1].used) {
-                  screen.draw.fillStyle = "#FF00FF";
-            } else {
-                  screen.draw.fillStyle = "#808080";
-            };
-            screen.draw.fillEllipse(8/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/20*screen.width,1/20*screen.height,0,Math.PI*2);
-            screen.draw.fillRect(7/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/10*screen.width,1/20*screen.height);
-            if(levels[i*4+2] == undefined) {
-                  levels[i*4+2] = {used: false, level: {}, name: "",};
-                  cookie.set('levels',JSON.stringify(levels));
-            };
-            gameSquareButtons['l'+((i-1)*4+2)] = {
-                  left: 11/20,
-                  top: 40/screen.height+((7/40+(i*4/20))),
-                  width: 1/10,
-                  height: 1/10,
-                  click: function() {
-                        stagePressed((i-1)*4+2);
-                  },
-            };
-            if(levels[i*4+2].used) {
-                  screen.draw.fillStyle = "#00FFFF";
-            } else {
-                  screen.draw.fillStyle = "#808080";
-            };
-            screen.draw.fillEllipse(12/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/20*screen.width,1/20*screen.height,0,Math.PI*2);
-            screen.draw.fillRect(11/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/10*screen.width,1/20*screen.height);
-            if(levels[i*4+3] == undefined) {
-                  levels[i*4+3] = {used: false, level: {}, name: "",};
-                  cookie.set('levels',JSON.stringify(levels));
-            };
-            gameSquareButtons['l'+((i-1)*4+3)] = {
-                  left: 15/20,
-                  top: 40/screen.height+((7/40+(i*4/20))),
-                  width: 1/10,
-                  height: 1/10,
-                  click: function() {
-                        stagePressed((i-1)*4+3);
-                  },
-            };
-            if(levels[i*4+3].used) {
-                  screen.draw.fillStyle = "#FF8000";
-            } else {
-                  screen.draw.fillStyle = "#808080";
-            };
-            screen.draw.fillEllipse(16/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/20*screen.width,1/20*screen.height,0,Math.PI*2);
-            screen.draw.fillRect(15/20*screen.width,40+((9/40+(i*4/20))*screen.height),1/10*screen.width,1/20*screen.height);
+            drawLevels(i);
+      };
+      if(selectedL.menu) {
+            SIDEMENU();
       };
       };
       if(menu === "RL") {
